@@ -1,0 +1,46 @@
+@(message: String)
+
+@main(message) {
+    <style>
+            table, th , td {
+                border: 1px solid grey;
+                border-collapse: collapse;
+                padding: 5px;
+            }
+            table tr:nth-child(odd) {
+                background-color: #f1f1f1;
+            }
+            table tr:nth-child(even) {
+                background-color: #ffffff;
+            }
+    </style>
+    <div ng-controller="Tweets"  >
+
+            <table >
+
+                    <thead ng-if="tweets.length !=0">
+                <tr style="font-weight:bold" ><th align="center">S.No.</th>
+                    <th>User Name</th>
+                    <th>Text</th>
+                    <th>Geo Location</th>
+                    <th>Coordinates</th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <tr ng-repeat="tweet in tweets">
+                    <th> {{$index + 1}}</th>
+                    <td ><a  href="@routes.Tweets.search1( "modi" )">{{tweet.user.screen_name}}</a></td>
+                    <td>{{tweet.text}}</td>
+                    <td>{{tweet.user.location}}</td>
+                    <td>{{tweet.coordinates}}</td>
+
+                </tr>
+                </tbody>
+
+            </table>
+
+    </div>
+
+}
