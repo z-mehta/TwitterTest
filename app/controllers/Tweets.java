@@ -59,6 +59,8 @@ public class Tweets extends Controller {
 
 
 
+
+
        Promise<JsonNode> a=responsePromise
                 .filter(response -> response.getStatus() == Http.Status.OK)
                 .map(response -> response.asJson());
@@ -71,16 +73,31 @@ public class Tweets extends Controller {
         String followers=jn.get("followers_count").asText();
 
 
-
-
-
-
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode tweets = mapper.createArrayNode();
 
         ObjectNode user = mapper.createObjectNode();
         user.put("userid",  jn.get("id").asLong());
-        return ok(views.html.user.render(image,uname,description,following,followers) );
+
+
+        Promise<WSResponse> responsePromise1 =WS.url("https://api.twitter.com/1.1/statuses/user_timeline.json")
+                .setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
+                .setHeader("Authorization", "Bearer "+token)
+                .setQueryParameter("screen_name", name)
+                .setQueryParameter("count", "10")
+                .get()  ;
+
+        Promise<JsonNode> a1=responsePromise1
+                .filter(response -> response.getStatus() == Http.Status.OK)
+                .map(response -> response.asJson());
+
+        List<String> text= new ArrayList<>();
+        for(JsonNode node : a1.get(1000)) {
+            text.add( node.path("text").asText());
+        }
+
+
+        return ok(views.html.user.render(image,uname,description,following,followers,text) );
 
         //can also map using method references - WSResponse::asJson*/
       // return responsePromise
@@ -101,25 +118,30 @@ public class Tweets extends Controller {
         });
     }
 
-    public static Result fetchTweet(String query) {
+    public static Result fetchTweet(String name) {
+
+        System.out.println(name);
         String token= "AAAAAAAAAAAAAAAAAAAAAHB%2F4wAAAAAAI69NlJD0CNk9SlQRy697nPF5oJQ%3DVYBnbQFjiGCL2WIXFuH3QJmOrGNmEO6kCjcXwZkdL7Z3sZHPhM";
-        //"http://twitter-search-proxy.herokuapp.com/search/tweets"
-        Promise<WSResponse> responsePromise = WS.url("https://api.twitter.com/1.1/search/tweets.json")
+        Promise<WSResponse> responsePromise1 =WS.url("https://api.twitter.com/1.1/statuses/user_timeline.json")
                 .setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
                 .setHeader("Authorization", "Bearer "+token)
-                .setQueryParameter("count","10")
-                .setQueryParameter("q", query).get()  ;
+                .setQueryParameter("screen_name", name)
+                .setQueryParameter("count", "10")
+                .get()  ;
 
-
-
-        Promise<JsonNode> a=responsePromise
+        Promise<JsonNode> a1=responsePromise1
                 .filter(response -> response.getStatus() == Http.Status.OK)
                 .map(response -> response.asJson());
-        JsonNode jn=a.get(1000);
-        String jn1=jn.path(8).asText();
-        System.out.println(jn1+"k");
+
+        String text="";
+        for(JsonNode node : a1.get(1000)) {
+             text = node.path("text").asText();
+
+
+            System.out.println(text);
+        }
         //can also map using method references - WSResponse::asJson
-        return ok(views.html.test1.render("Tweets",jn1));
+        return ok(views.html.test1.render("Tweets",text));
     }
 
 
@@ -133,14 +155,14 @@ public class Tweets extends Controller {
      * @param query
      * @return
      */
-    public static Promise<JsonNode> fetchTweets(String query) {
+    public static Promise<JsonNode> fetchTweets(String query1) {
         String token= "AAAAAAAAAAAAAAAAAAAAAHB%2F4wAAAAAAI69NlJD0CNk9SlQRy697nPF5oJQ%3DVYBnbQFjiGCL2WIXFuH3QJmOrGNmEO6kCjcXwZkdL7Z3sZHPhM";
         //"http://twitter-search-proxy.herokuapp.com/search/tweets"
         Promise<WSResponse> responsePromise = WS.url("https://api.twitter.com/1.1/search/tweets.json")
                 .setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
                 .setHeader("Authorization", "Bearer "+token)
                 .setQueryParameter("count","10")
-                .setQueryParameter("q", query).get()  ;
+                .setQueryParameter("q", query1).get()  ;
 
 
         //can also map using method references - WSResponse::asJson

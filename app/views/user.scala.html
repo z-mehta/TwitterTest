@@ -1,4 +1,4 @@
-@(image: String , uname: String,description: String , following: String, followers:String)
+@(image: String , uname: String,description: String , following: String, followers:String,t1:List[String])
 
 
 <html>
@@ -45,6 +45,7 @@
                             window.history.back();
                         }
                 </script></tr>
+            <tr><td>@t1.get(0)</td></tr>
         </table>
     </body>
 
