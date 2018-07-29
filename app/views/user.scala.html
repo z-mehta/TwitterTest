@@ -1,6 +1,11 @@
-@(message: String)
+@(image: String , uname: String,description: String , following: String, followers:String)
 
-@main(message) {
+
+<html>
+
+    <head><title>User Profile</title></head>
+
+
     <style>
             table, th , td {
                 border: 1px solid grey;
@@ -14,33 +19,34 @@
                 background-color: #ffffff;
             }
     </style>
-    <div ng-controller="Tweets"  >
+    <body>
 
-            <table >
+        <table>
+            <tr><td>Profile Image</td><td><img src="@image" alt="User Image" height="100" width="100" ></td></tr>
+            <tr>
+                <td>Name</td>
+                <td>@uname</td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td>@description</td>
+            </tr>
+            <tr>
+                <td>Following</td>
+                <td>@following</td>
+            <tr>
+                <td>Followers</td>
+                <td>@followers</td>
+            </tr>
+            <tr> <button onclick="goBack()">Go Back</button>
 
-                    <thead ng-if="tweets.length !=0">
-                <tr style="font-weight:bold" ><th align="center">S.No.</th>
-                    <th>User Name</th>
-                    <th>Text</th>
-                    <th>Geo Location</th>
-                    <th>Coordinates</th>
-                </tr>
-                </thead>
+                <script>
+                        function goBack() {
+                            window.history.back();
+                        }
+                </script></tr>
+        </table>
+    </body>
 
-                <tbody>
 
-                <tr ng-repeat="tweet in tweets">
-                    <th> {{$index + 1}}</th>
-                    <td ><a  href="@routes.Tweets.search1( "modi" )">{{tweet.user.screen_name}}</a></td>
-                    <td>{{tweet.text}}</td>
-                    <td>{{tweet.user.location}}</td>
-                    <td>{{tweet.coordinates}}</td>
-
-                </tr>
-                </tbody>
-
-            </table>
-
-    </div>
-
-}
+</html>

@@ -4,11 +4,14 @@
 
 GET        /                    controllers.Tweets.index
 
+
 GET        /ws                  controllers.Tweets.ws
 
 GET        /tweets              controllers.Tweets.search(query: String)
 
-GET        /Timeline            controllers.Tweets.search1(name: String)
+GET        /tweets1              controllers.Tweets.fetchTweet(query: String)
+
+GET        /Timeline            controllers.Tweets.Timeline(name: String)
 
 # Use `Assets.versioned` to enable Play 2.3's Asset Fingerprinting
 GET        /assets/*file        controllers.Assets.versioned(path="/public", file: Asset)

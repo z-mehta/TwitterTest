@@ -29,18 +29,26 @@
 
                 <tbody>
 
-                <tr ng-repeat="tweet in tweets">
+                <tr ng-repeat="tweet in tweets" >
                     <th> {{$index + 1}}</th>
-                    <td ><a  href="@routes.Tweets.search1( "modi" )">{{tweet.user.screen_name}}</a></td>
+                    <td ><a  ng-href="/Timeline?name={{tweet.user.screen_name}}"> {{tweet.user.screen_name}}</a></td>
                     <td>{{tweet.text}}</td>
                     <td>{{tweet.user.location}}</td>
                     <td>{{tweet.coordinates}}</td>
+
 
                 </tr>
                 </tbody>
 
             </table>
 
-    </div>
+        <button onclick="goBack()">Go Back</button>
 
+        <script>
+                function goBack() {
+                    window.history.back();
+                }
+        </script>
+
+    </div>
 }

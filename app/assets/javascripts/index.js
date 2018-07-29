@@ -30,7 +30,7 @@ app.controller('Search', function($scope, $http, $timeout, Twitter) {
 
 app.controller('Tweets', function($scope, $http, $timeout, Twitter) {
 
-    $scope.tweets ;
+    $scope.tweets=[] ;
 
     $scope.$watch(
         function() {
@@ -39,6 +39,10 @@ app.controller('Tweets', function($scope, $http, $timeout, Twitter) {
         function(tweets) {
             $scope.tweets = tweets;
 
+            console.log(tweets);
+        },
+        $scope.showClient = function(tweet) {
+            $location.path('#/Timeline/' + tweet.user.screen_name);
         }
     );
 

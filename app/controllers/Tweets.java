@@ -13,6 +13,7 @@ import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.WebSocket;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -21,6 +22,7 @@ import java.util.concurrent.CompletionStage;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import views.html.index;
+import views.html.*;
 
 import static java.util.stream.Collectors.toList;
 import static utils.Streams.stream;
@@ -37,14 +39,14 @@ public class Tweets extends Controller {
                 .map(jsonNode -> ok(jsonNode));
     }
 
-    public static Promise<Result> search1(String query) {
+  // public static Promise<Result> search1(String query) {
 
-        return Timeline(query)
-                .map(jsonNode -> ok(jsonNode));
-    }
+    //    return Timeline(query)
+     //          .map(jsonNode -> ok(jsonNode));
+    //}
 
 
-    public static Promise<JsonNode> Timeline(String name) {
+    public static Result Timeline(String name) {
 
         System.out.println(name);
        String token= "AAAAAAAAAAAAAAAAAAAAAHB%2F4wAAAAAAI69NlJD0CNk9SlQRy697nPF5oJQ%3DVYBnbQFjiGCL2WIXFuH3QJmOrGNmEO6kCjcXwZkdL7Z3sZHPhM";
@@ -57,23 +59,34 @@ public class Tweets extends Controller {
 
 
 
-       /* Promise<Long> a=responsePromise
+       Promise<JsonNode> a=responsePromise
                 .filter(response -> response.getStatus() == Http.Status.OK)
-                .map(response -> response.asJson())
-                .map(r->r.path("id").asLong());
-        Long id=a.get(1000);
+                .map(response -> response.asJson());
+        JsonNode jn=a.get(1000);
+
+        String image=jn.get("profile_image_url_https").asText();
+        String uname=jn.get("name").asText();
+        String description=jn.get("description").asText();
+        String following=jn.get("friends_count").asText();
+        String followers=jn.get("followers_count").asText();
+
+
+
+
+
 
         ObjectMapper mapper = new ObjectMapper();
         ArrayNode tweets = mapper.createArrayNode();
 
         ObjectNode user = mapper.createObjectNode();
-        user.put("userid", id);
+        user.put("userid",  jn.get("id").asLong());
+        return ok(views.html.user.render(image,uname,description,following,followers) );
 
         //can also map using method references - WSResponse::asJson*/
-       return responsePromise
-               .filter(response -> response.getStatus() == Http.Status.OK)
-               .map(response -> response.asJson())
-               .recover(Tweets::errorResponse);
+      // return responsePromise
+        //       .filter(response -> response.getStatus() == Http.Status.OK)
+          //     .map(response -> response.asJson())
+            //   .recover(Tweets::errorResponse);
 
     }
 
@@ -87,6 +100,28 @@ public class Tweets extends Controller {
             });
         });
     }
+
+    public static Result fetchTweet(String query) {
+        String token= "AAAAAAAAAAAAAAAAAAAAAHB%2F4wAAAAAAI69NlJD0CNk9SlQRy697nPF5oJQ%3DVYBnbQFjiGCL2WIXFuH3QJmOrGNmEO6kCjcXwZkdL7Z3sZHPhM";
+        //"http://twitter-search-proxy.herokuapp.com/search/tweets"
+        Promise<WSResponse> responsePromise = WS.url("https://api.twitter.com/1.1/search/tweets.json")
+                .setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
+                .setHeader("Authorization", "Bearer "+token)
+                .setQueryParameter("count","10")
+                .setQueryParameter("q", query).get()  ;
+
+
+
+        Promise<JsonNode> a=responsePromise
+                .filter(response -> response.getStatus() == Http.Status.OK)
+                .map(response -> response.asJson());
+        JsonNode jn=a.get(1000);
+        String jn1=jn.path(8).asText();
+        System.out.println(jn1+"k");
+        //can also map using method references - WSResponse::asJson
+        return ok(views.html.test1.render("Tweets",jn1));
+    }
+
 
     /**
      * Fetch the latest tweets and return the Promise of the json results.
@@ -106,7 +141,6 @@ public class Tweets extends Controller {
                 .setHeader("Authorization", "Bearer "+token)
                 .setQueryParameter("count","10")
                 .setQueryParameter("q", query).get()  ;
-
 
 
         //can also map using method references - WSResponse::asJson
