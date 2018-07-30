@@ -23,7 +23,7 @@
         <h1><b>Words Statistics</b></h1>
 
         <br>
-        Total Number of Unique Words : <t>@words.length</t>
+        Total Number of Unique Words : <t>@words.split(" ").length</t>
         <br><br>
 
 
@@ -38,7 +38,7 @@
 
 
 
-            @for( (order,count) <-  words.split(" ,").zipWithIndex) {
+            @for( (order,count) <-  words.split(" ").zipWithIndex) {
                 <tr>
                     <td>@(count+1)</td>
                     <td>@order</td>

@@ -18,10 +18,12 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import scala.collection.immutable.ListMap;
+import utils.Streams;
 import views.html.index;
 import views.html.*;
 
@@ -147,7 +149,7 @@ public class Tweets extends Controller {
         List<String> text= new ArrayList<>();
         List<String> utext= new ArrayList<>();
 
-        for(JsonNode node : a1.get(5000).path("statuses")) {
+        for(JsonNode node : a1.get(10000).path("statuses")) {
 //            System.out.println(node.path("user").path("location").asText());
             text.add(node.path("text").asText());
             utext.add(node.path("user").path("screen_name").asText());
@@ -157,7 +159,6 @@ public class Tweets extends Controller {
         List<String> text1=text.stream().map(w -> w.split(" "))
                 .flatMap(Arrays::stream)
                 .distinct()
-                .sorted()
                 .collect(Collectors.toList());
 
         text1.remove(" ");
@@ -173,10 +174,13 @@ public class Tweets extends Controller {
 
 
     public static Result stats(String words){
-//        System.out.println(words);
-        //words.replace(" ,","");
+        //System.out.println(words);
+        String words1=words.replace(",","").replace("[",
+                "").replace("]","");
 
-        return ok(views.html.stats.render( words));
+        List<String> words2=Stream.of(words1).sorted((String o1,String o2) -> o1.compareTo(o2)).collect(toList());
+        //System.out.println(words2);
+        return ok(views.html.stats.render( words1));
     }
     public static Result words1(){return ok(views.html.words1.render());}
 
