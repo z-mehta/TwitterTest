@@ -1,5 +1,6 @@
 package controllers;
 
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -156,27 +157,28 @@ public class Tweets extends Controller {
         List<String> text1=text.stream().map(w -> w.split(" "))
                 .flatMap(Arrays::stream)
                 .distinct()
+                .sorted()
                 .collect(Collectors.toList());
 
         text1.remove(" ");
+        text1.remove("");
 
         //System.out.println(text1);
 
 
         return ok(views.html.words.render(text,text1,utext) );
 
-        //can also map using method references - WSResponse::asJson*/
-        // return responsePromise
-        //       .filter(response -> response.getStatus() == Http.Status.OK)
-        //     .map(response -> response.asJson())
-        //   .recover(Tweets::errorResponse);
 
     }
 
 
-    public static Result stats(List<String> words){
-        return ok(views.html.stats.render(words));
+    public static Result stats(String words){
+//        System.out.println(words);
+        //words.replace(" ,","");
+
+        return ok(views.html.stats.render( words));
     }
+    public static Result words1(){return ok(views.html.words1.render());}
 
     public static WebSocket<JsonNode> ws() {
         return WebSocket.whenReady((in, out) -> {

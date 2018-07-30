@@ -1,4 +1,4 @@
-@(words:List[String])
+@(words:String)
 
 
 <html>
@@ -22,17 +22,27 @@
     <body>
         <h1><b>Words Statistics</b></h1>
 
+        <br>
+        Total Number of Unique Words : <t>@words.length</t>
+        <br><br>
+
+
         <table>
 
             <tr>
-                <td>Word</td>
-                <td>Frequency</td>
+                <td>S.No.</td>
+                <td>Words</td>
+                <td>Word Size</td>
+
             </tr>
 
-            @for( (order,count) <-  words.zipWithIndex) {
+
+
+            @for( (order,count) <-  words.split(" ,").zipWithIndex) {
                 <tr>
                     <td>@(count+1)</td>
                     <td>@order</td>
+                    <td>@order.length</td>
                 </tr>
             }
 

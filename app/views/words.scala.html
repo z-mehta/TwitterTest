@@ -4,12 +4,12 @@
 <html>
 
     <head><title>Tweet Words</title></head>
-    <body>
+
 
         <form action="/words?name=sname">
             <input type="text" name="sname" value="">
-            <br>
-            <input type="submit" value="Submit">
+
+            <input type="submit" value="Search">
         </form>
 
 
@@ -27,15 +27,16 @@
                 }
         </style>
         <body>
-
-
+<br>
+            <a href="/stats?words=@text1.toString">Words Statistics</a>
+<br><br>
             <table >
 
                 <thead ng-if="@text.length !=0">
                     <tr style="font-weight:bold" ><th align="center">S.No.</th>
-                        <th>User Name</th>
+
                         <th>Tweet Text</th>
-                        <th>Statistics</th>
+
 
                     </tr>
                 </thead>
@@ -45,14 +46,14 @@
 
                         <tr >
                             <th>@(count + 1)</th>
-                            <td></td>
+
                             <td>@order</td>
-                            <td><a ng-href="/stats?lname=@text1">Word Statistics</a></td>
+
 
                         </tr>
                     }
                 </tbody>
 
             </table>
-    </body>
+        </body>
 </html>
