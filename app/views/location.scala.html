@@ -1,0 +1,49 @@
+@import java.util
+@(t1:List[String],lname:String, ltweet: Map[String,String])
+@import java.math.BigInteger; var i=1
+
+<html>
+
+    <head><title>Location Tweets</title></head>
+
+
+    <style>
+            table, th , td {
+                border: 1px solid grey;
+                border-collapse: collapse;
+                padding: 5px;
+            }
+            table tr:nth-child(odd) {
+                background-color: #f1f1f1;
+            }
+            table tr:nth-child(even) {
+                background-color: #ffffff;
+            }
+    </style>
+    <body>
+
+        <h1><b>Tweets from Location : @lname</b></h1>
+        <table>
+            <tr>
+                <td><b>S.No.</b></td>
+                <td><b>Tweet Text</b></td>
+                <td><b>Location</b></td>
+
+            </tr>
+
+
+            @for(((order,index),count) <-  ltweet.zipWithIndex) {
+                <tr>
+                    <td>@(count+1)</td>
+                    <td>@order</td>
+                    <td>@index</td>
+
+
+                </tr>
+            }
+
+        </table>
+    </body>
+
+
+</html>

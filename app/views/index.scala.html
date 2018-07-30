@@ -18,7 +18,7 @@
 
             <table >
 
-                    <thead ng-if="tweets.length !=0">
+                        <thead ng-if="tweets.length !=0">
                 <tr style="font-weight:bold" ><th align="center">S.No.</th>
                     <th>User Name</th>
                     <th>Text</th>
@@ -33,7 +33,7 @@
                     <th> {{$index + 1}}</th>
                     <td ><a  ng-href="/Timeline?name={{tweet.user.screen_name}}"> {{tweet.user.screen_name}}</a></td>
                     <td>{{tweet.text}}</td>
-                    <td>{{tweet.user.location}}</td>
+                    <td><a  ng-href="/Location?lname={{tweet.user.location}}">{{tweet.user.location}}</a></td>
                     <td>{{tweet.coordinates}}</td>
 
 
@@ -42,13 +42,6 @@
 
             </table>
 
-        <button onclick="goBack()">Go Back</button>
-
-        <script>
-                function goBack() {
-                    window.history.back();
-                }
-        </script>
 
     </div>
 }
