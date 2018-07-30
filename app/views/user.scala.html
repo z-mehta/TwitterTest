@@ -55,47 +55,13 @@
                 <td><b>S.No.</b></td>
                 <td><b>Tweet Text</b></td>
             </tr>
-            <tr>
-                <td><b>1.</b></td>
-                <td>@t1.get(0)</td>
-            </tr>
-            <tr>
-                <td><b>2.</b></td>
-                <td>@t1.get(1)</td>
-            </tr>
-            <tr>
-                <td><b>3.</b></td>
-                <td>@t1.get(2)</td>
-            </tr>
-            <tr>
-                <td><b>4.</b></td>
-                <td>@t1.get(3)</td>
-            </tr>
-            <tr>
-                <td><b>5.</b></td>
-                <td>@t1.get(4)</td>
-            </tr>
-            <tr>
-                <td><b>6.</b></td>
-                <td>@t1.get(5)</td>
-            </tr>
-            <tr>
-                <td><b>7.</b></td>
-                <td>@t1.get(6)</td>
-            </tr>
-            <tr>
-                <td><b>8.</b></td>
-                <td>@t1.get(7)</td>
-            </tr>
-            <tr>
-                <td><b>9.</b></td>
-                <td>@t1.get(8)</td>
-            </tr>
-            <tr>
-                <td><b>10.</b></td>
-                <td>@t1.get(9)</td>
-            </tr>
 
+            @for( (order,count) <-  t1.zipWithIndex) {
+                <tr>
+                    <td>@(count+1)</td>
+                    <td>@order</td>
+        </tr>
+}
 
         </table>
     </body>

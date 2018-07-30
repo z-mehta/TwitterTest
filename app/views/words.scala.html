@@ -1,0 +1,58 @@
+@(text: List[String],text1: List[String], utext:List[String])
+
+<!DOCTYPE html>
+<html>
+
+    <head><title>Tweet Words</title></head>
+    <body>
+
+        <form action="/words?name=sname">
+            <input type="text" name="sname" value="">
+            <br>
+            <input type="submit" value="Submit">
+        </form>
+
+
+        <style>
+                table, th , td {
+                    border: 1px solid grey;
+                    border-collapse: collapse;
+                    padding: 5px;
+                }
+                table tr:nth-child(odd) {
+                    background-color: #f1f1f1;
+                }
+                table tr:nth-child(even) {
+                    background-color: #ffffff;
+                }
+        </style>
+        <body>
+
+
+            <table >
+
+                <thead ng-if="@text.length !=0">
+                    <tr style="font-weight:bold" ><th align="center">S.No.</th>
+                        <th>User Name</th>
+                        <th>Tweet Text</th>
+                        <th>Statistics</th>
+
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for( (order,count) <-  text.zipWithIndex ) {
+
+                        <tr >
+                            <th>@(count + 1)</th>
+                            <td></td>
+                            <td>@order</td>
+                            <td><a ng-href="/stats?lname=@text1">Word Statistics</a></td>
+
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+    </body>
+</html>

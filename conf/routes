@@ -15,6 +15,10 @@ GET        /Timeline            controllers.Tweets.Timeline(name: String)
 
 GET        /Location            controllers.Tweets.Location(lname: String)
 
+GET        /words            controllers.Tweets.words(query: String)
+
+GET        /stats            controllers.Tweets.stats(words: List[String] )
+
 
 # Use `Assets.versioned` to enable Play 2.3's Asset Fingerprinting
 GET        /assets/*file        controllers.Assets.versioned(path="/public", file: Asset)

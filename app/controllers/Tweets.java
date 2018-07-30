@@ -16,9 +16,11 @@ import play.mvc.WebSocket;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.CompletionStage;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import scala.collection.immutable.ListMap;
 import views.html.index;
 import views.html.*;
 
@@ -111,12 +113,11 @@ public class Tweets extends Controller {
         Map<String,String> ltweet= new LinkedHashMap<>();
         for(JsonNode node : a1.get(1000).path("statuses")) {
             ltweet.put(node.path("text").asText(),node.path("user").path("location").asText());
-            System.out.println(node.path("user").path("location").asText());
-            text.add(node.path("text").asText());
+//            System.out.println(node.path("user").path("location").asText());
         }
         //System.out.println(text);
 
-        return ok(views.html.location.render(text,name,ltweet) );
+        return ok(views.html.location.render(name,  ltweet) );
 
         //can also map using method references - WSResponse::asJson*/
         // return responsePromise
@@ -126,6 +127,56 @@ public class Tweets extends Controller {
 
     }
 
+    public static Result words(String name) {
+
+        //System.out.println(name);
+        String token= "AAAAAAAAAAAAAAAAAAAAAHB%2F4wAAAAAAI69NlJD0CNk9SlQRy697nPF5oJQ%3DVYBnbQFjiGCL2WIXFuH3QJmOrGNmEO6kCjcXwZkdL7Z3sZHPhM";
+
+        Promise<WSResponse> responsePromise1 = WS.url("https://api.twitter.com/1.1/search/tweets.json")
+                .setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
+                .setHeader("Authorization", "Bearer "+token)
+                .setQueryParameter("count","100")
+                .setQueryParameter("q", name)
+                .get()  ;
+
+        Promise<JsonNode> a1=responsePromise1
+                .filter(response -> response.getStatus() == Http.Status.OK)
+                .map(response -> response.asJson());
+
+        List<String> text= new ArrayList<>();
+        List<String> utext= new ArrayList<>();
+
+        for(JsonNode node : a1.get(5000).path("statuses")) {
+//            System.out.println(node.path("user").path("location").asText());
+            text.add(node.path("text").asText());
+            utext.add(node.path("user").path("screen_name").asText());
+
+        }
+        //System.out.println(text);
+        List<String> text1=text.stream().map(w -> w.split(" "))
+                .flatMap(Arrays::stream)
+                .distinct()
+                .collect(Collectors.toList());
+
+        text1.remove(" ");
+
+        //System.out.println(text1);
+
+
+        return ok(views.html.words.render(text,text1,utext) );
+
+        //can also map using method references - WSResponse::asJson*/
+        // return responsePromise
+        //       .filter(response -> response.getStatus() == Http.Status.OK)
+        //     .map(response -> response.asJson())
+        //   .recover(Tweets::errorResponse);
+
+    }
+
+
+    public static Result stats(List<String> words){
+        return ok(views.html.stats.render(words));
+    }
 
     public static WebSocket<JsonNode> ws() {
         return WebSocket.whenReady((in, out) -> {

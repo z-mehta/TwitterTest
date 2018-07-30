@@ -1,10 +1,9 @@
-@import java.util
-@(lname:String, ltweet: Map[String,String])
-@import java.math.BigInteger; var i=1
+@(words:List[String])
+
 
 <html>
 
-    <head><title>Location Tweets</title></head>
+    <head><title>Words Statistics</title></head>
 
 
     <style>
@@ -21,29 +20,22 @@
             }
     </style>
     <body>
+        <h1><b>Words Statistics</b></h1>
 
-        <h1><b>Tweets from Location : @lname</b></h1>
         <table>
-            <tr>
-                <td><b>S.No.</b></td>
-                <td><b>Tweet Text</b></td>
-                <td><b>Location</b></td>
 
+            <tr>
+                <td>Word</td>
+                <td>Frequency</td>
             </tr>
 
-
-            @for(((order,index),count) <-  ltweet.zipWithIndex) {
+            @for( (order,count) <-  words.zipWithIndex) {
                 <tr>
                     <td>@(count+1)</td>
                     <td>@order</td>
-                    <td>@index</td>
-
-
                 </tr>
             }
 
         </table>
     </body>
-
-
 </html>
