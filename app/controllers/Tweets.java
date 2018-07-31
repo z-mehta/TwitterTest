@@ -174,7 +174,7 @@ public class Tweets extends Controller {
 
 
     public static Result stats(String words){
-        //System.out.println(words);
+        System.out.println(words);
         String words1=words.replace(",","").replace("[",
                 "").replace("]","");
 

@@ -19,7 +19,6 @@ GET        /words1            controllers.Tweets.words1
 
 GET        /words            controllers.Tweets.words(sname: String)
 
-
 GET        /stats            controllers.Tweets.stats(words: String )
 
 
