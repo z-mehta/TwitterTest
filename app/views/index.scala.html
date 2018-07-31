@@ -37,7 +37,7 @@
                     <td>{{tweet.text}}</td>
                     <td><a  ng-href="/Location?lname={{tweet.user.location}}">{{tweet.user.location}}</a></td>
                     <td>{{tweet.coordinates}}</td>
-                    <td ><a ng-repeat="text in tweet.entities.hashtags" ng-href="/Location?lname={{text.text}}">{{text.text}},</a></td>
+                    <td ><a ng-repeat="text in tweet.entities.hashtags" ng-href="/Location?lname=%23{{text.text}}">{{text.text}},</a></td>
 
 
 
