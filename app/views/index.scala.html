@@ -24,6 +24,8 @@
                     <th>Text</th>
                     <th>Geo Location</th>
                     <th>Coordinates</th>
+                    <th>Hashtags</th>
+
                 </tr>
                 </thead>
 
@@ -35,6 +37,9 @@
                     <td>{{tweet.text}}</td>
                     <td><a  ng-href="/Location?lname={{tweet.user.location}}">{{tweet.user.location}}</a></td>
                     <td>{{tweet.coordinates}}</td>
+                    <td ><a ng-repeat="text in tweet.entities.hashtags" ng-href="/Location?lname={{text.text}}">{{text.text}},</a></td>
+
+
 
 
                 </tr>
