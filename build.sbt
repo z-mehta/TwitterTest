@@ -12,6 +12,11 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-testkit" % "2.3.3" % "test"
 )
 
+
+
 scalaVersion := "2.11.1"
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava, SbtWeb)
+
+jacoco.settings
+

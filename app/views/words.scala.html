@@ -1,4 +1,5 @@
-@(text: List[String],text1: List[String], utext:List[String])
+@import java.util
+@(text: List[String],text1:util.LinkedHashMap[String,Integer], utext:List[String], name: String, sentiments:String)
 
 <!DOCTYPE html>
 <html>
@@ -28,8 +29,16 @@
         </style>
         <body>
 <br>
-            <a href="/stats?words=@text1">Words Statistics</a>
-<br><br>
+            <a href="/stats?words=@text1.toString"> Words Statistics</a>
+
+            &nbsp;&nbsp;&nbsp;&nbsp;Overall Tweets Sentiments:&nbsp;
+                Search Terms  &nbsp;  >>>&nbsp;&nbsp;
+                @name &nbsp;&nbsp;>>>
+
+                &nbsp;&nbsp; @sentiments
+
+
+            <br><br>
             <table >
 
                 <thead ng-if="@text.length !=0">

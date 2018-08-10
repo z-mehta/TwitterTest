@@ -1,4 +1,4 @@
-@(words:String)
+@(words:String,total:Long)
 
 
 <html>
@@ -23,26 +23,28 @@
         <h1><b>Words Statistics</b></h1>
 
         <br>
-        Total Number of Unique Words : <t>@words.split(" ").length</t>
+        <b>Total Number of Unique Words : <t>@total</t></b>
         <br><br>
 
 
         <table>
 
             <tr>
-                <td>S.No.</td>
-                <td>Words</td>
-                <td>Word Size</td>
+                <td><b>S.No.</b></td>
+                <td><b>Words</b></td>
+                <td><b> Frequency</b></td>
 
             </tr>
 
 
 
-            @for( (order,count) <-  words.split(" ").zipWithIndex) {
+
+            @for( (order,count) <-  words.trim().split(", ").zipWithIndex) {
                 <tr>
                     <td>@(count+1)</td>
-                    <td>@order</td>
-                    <td>@order.length</td>
+
+                    <td>@order.split("=").apply(0)</td>
+                    <td>@order.split("=").apply(1)</td>
                 </tr>
             }
 

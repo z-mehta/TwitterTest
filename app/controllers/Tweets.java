@@ -1,6 +1,6 @@
 package controllers;
 
-
+import actors.UserActor;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -13,10 +13,13 @@ import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.WebSocket;
+import actors.UserActor;
+
 
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.CompletionStage;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,12 +30,14 @@ import utils.Streams;
 import views.html.index;
 import views.html.*;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 import static utils.Streams.stream;
 
 public class Tweets extends Controller {
 
     public static Result index() {
+
+        WebSocket.withActor(UserActor::props);
         return ok(views.html.index.render("TweetMap"));
     }
 
@@ -41,13 +46,6 @@ public class Tweets extends Controller {
         return fetchTweets(query)
                 .map(jsonNode -> ok(jsonNode));
     }
-
-  // public static Promise<Result> search1(String query) {
-
-    //    return Timeline(query)
-     //          .map(jsonNode -> ok(jsonNode));
-    //}
-
 
     public static Result Timeline(String name) {
 
@@ -86,6 +84,8 @@ public class Tweets extends Controller {
             text.add( node.path("text").asText());
         }
 
+        WebSocket.withActor(UserActor::props);
+
         return ok(views.html.user.render(image,uname,description,following,followers,text) );
 
         //can also map using method references - WSResponse::asJson*/
@@ -105,8 +105,8 @@ public class Tweets extends Controller {
                 .setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
                 .setHeader("Authorization", "Bearer "+token)
                 .setQueryParameter("count","10")
-                .setQueryParameter("q", name)
-                .setQueryParameter("statuses.user.location",name).get()  ;
+                .setQueryParameter("statuses.user.location",name)
+                   .setQueryParameter("q", name).get()  ;
 
         Promise<JsonNode> a1=responsePromise1
                 .filter(response -> response.getStatus() == Http.Status.OK)
@@ -119,14 +119,9 @@ public class Tweets extends Controller {
 //            System.out.println(node.path("user").path("location").asText());
         }
         //System.out.println(text);
+        WebSocket.withActor(UserActor::props);
 
         return ok(views.html.location.render(name,  ltweet) );
-
-        //can also map using method references - WSResponse::asJson*/
-        // return responsePromise
-        //       .filter(response -> response.getStatus() == Http.Status.OK)
-        //     .map(response -> response.asJson())
-        //   .recover(Tweets::errorResponse);
 
     }
 
@@ -155,70 +150,107 @@ public class Tweets extends Controller {
             utext.add(node.path("user").path("screen_name").asText());
 
         }
-        //System.out.println(text);
+        //System.out.println(text.size());
         List<String> text1=text.stream().map(w -> w.split(" "))
                 .flatMap(Arrays::stream)
-                .distinct()
+                //.distinct()
                 .collect(Collectors.toList());
 
-        text1.remove(" ");
-        text1.remove("");
+        //counting happy emoticons
+        Long happycount=text1.stream().filter(
+          s -> s.contains("\uD83D\uDE0A") || s.contains("\uD83D\uDE02") || s.contains("\uD83D\uDE03")
+                  || s.contains("\uD83D\uDE04") || s.contains(":)") || s.contains(":-)")
+        ).count();
+        //System.out.println(happycount);
+
+        //counting sad emoticons
+        Long sadcount=text1.stream().filter(
+                s ->s.contains("\uD83D\uDE23") || s.contains("\uD83D\uDE29") || s.contains("\uD83D\uDE13")
+                        || s.contains("\uD83D\uDE20")    || s.contains("\uD83D\uDE21")  || s.contains("\uD83D\uDE22")
+                        || s.contains("\uD83D\uDE1E") || s.contains("\uD83D\uDE2D") || s.contains(":(")
+                        || s.contains(":-(")
+        ).count();
+        //System.out.println(sadcount);
+
+        //counting neutral emoticons
+        Long neutralcount=text1.stream().filter(
+                s -> s.equals(":-|")  || s.equals(":|")
+        ).count();
+        //System.out.println(neutralcount);
+
+
+        //ratio
+        Double total= Double.valueOf(happycount+sadcount+neutralcount);
+        Double happyratio=(happycount/total)*100;
+        Double sadratio=(sadcount/total)*100;
+
+        //System.out.println(total+"h"+happyratio+"sad"+sadratio);
+        String sentiment;
+        if(happyratio>=70){sentiment= ":-)";}
+        else if(sadratio>=70){sentiment=":-(";}
+        else{sentiment=":-|";}
+        //System.out.println("sen"+sentiment);
+
+        //System.out.println(text1.size());
+
+
+        Map<String, Integer> collect =
+                text1.stream().collect(groupingBy(Function.identity(), summingInt(e -> 1)));
+
+        LinkedHashMap<String, Integer> countByWordSorted = collect.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (v1, v2) -> {
+                            throw new IllegalStateException();
+                        },
+                        LinkedHashMap::new
+                ));
+        //System.out.println(countByWordSorted);
+
+
+
+        countByWordSorted.remove(" ");
+        countByWordSorted.remove("");
 
         //System.out.println(text1);
 
 
-        return ok(views.html.words.render(text,text1,utext) );
+        WebSocket.withActor(UserActor::props);
+        return ok(views.html.words.render(text,countByWordSorted,utext,name,sentiment) );
 
 
     }
-
 
     public static Result stats(String words){
-        System.out.println(words);
-        String words1=words.replace(",","").replace("[",
-                "").replace("]","");
+        //System.out.println(words);
+        String words1=words.replace("{","")
+                .replaceAll("}","");
 
-        List<String> words2=Stream.of(words1).sorted((String o1,String o2) -> o1.compareTo(o2)).collect(toList());
-        //System.out.println(words2);
-        return ok(views.html.stats.render( words1));
+        //System.out.println(words1);
+        Long total=Stream.of(words1)
+                .map(w->w.split(", "))
+                .flatMap(Arrays::stream)
+                .distinct().count();
+
+
+       WebSocket.withActor(UserActor::props);
+        return ok(views.html.stats.render( words1,total ));
     }
-    public static Result words1(){return ok(views.html.words1.render());}
+
+    public static Result words1(){
+        WebSocket.withActor(UserActor::props);
+    return ok(views.html.words1.render());}
+
 
     public static WebSocket<JsonNode> ws() {
-        return WebSocket.whenReady((in, out) -> {
-            in.onMessage(jsonNode -> {
-                String query = jsonNode.findPath("query").textValue();
-                fetchTweets(query).onRedeem(json -> out.write(json));
-            });
-            in.onClose(() -> {
-            });
-        });
-    }
-
-    public static Result fetchTweet(String name) {
-
-        System.out.println(name);
-        String token= "AAAAAAAAAAAAAAAAAAAAAHB%2F4wAAAAAAI69NlJD0CNk9SlQRy697nPF5oJQ%3DVYBnbQFjiGCL2WIXFuH3QJmOrGNmEO6kCjcXwZkdL7Z3sZHPhM";
-        Promise<WSResponse> responsePromise1 =WS.url("https://api.twitter.com/1.1/statuses/user_timeline.json")
-                .setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
-                .setHeader("Authorization", "Bearer "+token)
-                .setQueryParameter("screen_name", name)
-                .setQueryParameter("count", "10")
-                .get()  ;
-
-        Promise<JsonNode> a1=responsePromise1
-                .filter(response -> response.getStatus() == Http.Status.OK)
-                .map(response -> response.asJson());
-
-        String text="";
-        for(JsonNode node : a1.get(1000)) {
-             text = node.path("text").asText();
-
-
-            System.out.println(text);
-        }
-        //can also map using method references - WSResponse::asJson
-        return ok(views.html.test1.render("Tweets",text));
+        //create the UserActor using the static UserActor props method.
+        //the withActor method passes an out ActorRef that is wired to the
+        //WebSocket out channel.
+        //Use this out as the out parameter for UserActor
+        return WebSocket.withActor(out -> UserActor.props(out));
     }
 
 
@@ -242,6 +274,7 @@ public class Tweets extends Controller {
                 .setQueryParameter("q", query1).get()  ;
 
 
+
         //can also map using method references - WSResponse::asJson
         return responsePromise
                 .filter(response -> response.getStatus() == Http.Status.OK)
@@ -249,32 +282,6 @@ public class Tweets extends Controller {
                 .recover(Tweets::errorResponse);
     }
 
-    private static JsonNode transformStatusResponses(JsonNode jsonNode) {
-        //create a stream view of the jsonNode iterator
-        List<JsonNode> newJsonList = stream(jsonNode.findPath("statuses"))
-                //map the stream of json to update the values to have the geo-info
-                .map(json -> json.path("id"))
-                .collect(toList());
-
-        ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
-        objectNode.putArray("statuses").addAll(newJsonList);
-
-        return objectNode;
-    }
-    private static ObjectNode setCoordinates(ObjectNode nextStatus) {
-        nextStatus.putArray("coordinates").add(randomLat()).add(randomLon());
-        return nextStatus;
-    }
-
-    private static Random rand = new java.util.Random();
-
-    private static double randomLat() {
-        return (rand.nextDouble() * 180) - 90;
-    }
-
-    private static double randomLon() {
-        return (rand.nextDouble() * 360) - 180;
-    }
 
     /**
      * The error response when the twitter search fails.

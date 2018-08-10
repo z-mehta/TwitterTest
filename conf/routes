@@ -9,7 +9,7 @@ GET        /ws                  controllers.Tweets.ws
 
 GET        /tweets              controllers.Tweets.search(query: String)
 
-GET        /tweets1              controllers.Tweets.fetchTweet(sname: String)
+#GET        /tweets1              controllers.Tweets.fetchTweet(sname: String)
 
 GET        /Timeline            controllers.Tweets.Timeline(name: String)
 

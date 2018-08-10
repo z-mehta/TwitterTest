@@ -40,9 +40,6 @@ app.controller('Tweets', function($scope, $http, $timeout, Twitter) {
             $scope.tweets = tweets;
 
             console.log(tweets);
-        },
-        $scope.showClient = function(tweet) {
-            $location.path('#/Timeline/' + tweet.user.screen_name);
         }
     );
 
